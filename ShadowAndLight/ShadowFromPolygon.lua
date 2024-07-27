@@ -1,7 +1,8 @@
 -- this code, just like code which takes an ordered set of points and returns the area contained,
 -- returns the amount of uniform ambient light blocked by a polygon defined by an ordered set of points
 
--- returns area covered by triangle 0, a, b
+-- returns the ambient light obscured by a wall whose base is 
+-- the line segment ab and whose height extends up to infinity
 -- returns values from 0 to pi
 local function shadedCross(
 	nx, ny, nz, -- normal (make sure it is unit length)
@@ -18,7 +19,6 @@ local function shadedCross(
 	local sin = math.sqrt(cx*cx + cy*cy + cz*cz)
 	local cos = ax*bx + ay*by + az*bz
 	local det = cx*nx + cy*ny + cz*nz
-	print(sin, cos, det)
 	if sin == 0 then return 0 end
 	return det/(2*sin)*math.atan2(sin, cos)
 end
