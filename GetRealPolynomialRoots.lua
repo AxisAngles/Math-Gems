@@ -1,7 +1,8 @@
--- By eev1993
+-- By eev1993 & AxisAngle
 --This is an "improvement" on AxisAngle's solve function.
 --Commentary will be given.
 local err = 1e-10
+@native
 local function solve(a, b, c, d, e)
 	if not a then
 		return
@@ -24,6 +25,9 @@ local function solve(a, b, c, d, e)
 			local f0, f1 = solve(1, p, r)
 			if not f1 or f1 < 0 then
 				return
+			elseif f0 < 0 then -- we were missing this split case - AxisAngle
+				local g1 = math.sqrt(f1)
+				return k - g1, k + g1
 			else
 				local g0, g1 = math.sqrt(f0), math.sqrt(f1)
 				return k - g1, k - g0, k + g0, k + g1
@@ -85,3 +89,5 @@ local function solve(a, b, c, d, e)
 		return -b/a
 	end
 end
+
+return solve
