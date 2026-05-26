@@ -7,7 +7,7 @@ local function orthonormalizeRaw(Mx: vector, My: vector, Mz: vector): (vector, v
 	local Dxy, Dyy      = vector.dot(Mx, My), vector.dot(My, My)
 	local Dxz, Dyz, Dzz = vector.dot(Mx, Mz), vector.dot(My, Mz), vector.dot(Mz, Mz)
 
-	-- characteristic polynomial of S^2, l^3 - p2 l^2 + p1 l - p0 = 0
+	-- characteristic polynomial of S^2, lambda^3 - p2 lambda^2 + p1 lambda - p0 = 0
 	local p0 = (Dxy*Dyz - Dxz*Dyy)*Dxz + (Dxy*Dxz - Dxx*Dyz)*Dyz + (Dxx*Dyy - Dxy*Dxy)*Dzz
 	local p1 = Dxx*Dyy + Dxx*Dzz + Dyy*Dzz - Dxy*Dxy - Dxz*Dxz - Dyz*Dyz
 	local p2 = Dxx + Dyy + Dzz
@@ -26,17 +26,18 @@ local function orthonormalizeRaw(Mx: vector, My: vector, Mz: vector): (vector, v
 	local m = 2*math.sqrt(p)
 
 	local t = math.atan2(s, q)/3 -- more accurate than arccos
-	-- by construction l0 <= l1 <= l2
-	-- mu are the roots of S, the sqrt(D)
+	-- mu are the eigenvalues of S (sqrt(D))
 	local mu0 = math.sqrt(math.max(0, k - m*math.sin(t + math.pi/6)))
 	local mu1 = math.sqrt(math.max(0, k + m*math.sin(t - math.pi/6)))
 	local mu2 = math.sqrt(math.max(0, k + m*math.cos(t            )))
-	-- but we need to flip the minimum one if det(M) < 0
-	-- so that the output rotation has a determinant of 1 (not -1)
+	-- by construction mu0 <= mu1 <= mu2
+	-- if det(M) < 0, then it is a mirrored rotation, so we must mirror S to unmirror the rotation.
+	-- S^2 has 8 square roots depending on choice of mu signs.
+	-- choose the S which is as similar to principle S as possible 
 	local detM = vector.dot(vector.cross(Mx, My), Mz)
 	if detM < 0 then mu0 = -mu0 end
 
-	-- characteristic polynomial of S, m^3 - q2 m^2 + q1 m - q0 = 0
+	-- characteristic polynomial of S, mu^3 - q2 mu^2 + q1 mu - q0 = 0
 	local q0 = mu0*mu1*mu2
 	local q1 = mu0*mu1 + mu0*mu2 + mu1*mu2
 	local q2 = mu0 + mu1 + mu2
